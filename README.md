@@ -1,1 +1,0 @@
-# Kuznetsova_lab1
