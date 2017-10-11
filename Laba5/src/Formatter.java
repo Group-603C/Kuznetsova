@@ -2,6 +2,13 @@ import java.util.regex.*;
 
 public class Formatter
 {
+    public static void main(String[] args){
+
+        Formatter str=new Formatter();
+
+        System.out.println(str.build("Если ты не сдашь {0} - тебе {1}", "лабы", "конец"));
+    }
+
     public String build(String formatString, Object... arguments)
     {
         String pattern = "[0-9]";
@@ -17,12 +24,5 @@ public class Formatter
         formatString= formatString.replace("}","");
 
         return formatString;
-    }
-
-    public static void main(String[] args){
-
-        Formatter str=new Formatter();
-
-        System.out.println(str.build("Если ты не сдашь {0} - тебе {1}", "лабы", "конец"));
     }
 }
