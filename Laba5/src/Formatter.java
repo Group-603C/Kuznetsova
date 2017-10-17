@@ -10,48 +10,13 @@ public class Formatter
         System.out.println(text);
     }
 
-    class Container {
-
-        private int indexOpenQuote;
-        private int indexCloseQuote;
-        private String indexArgument;
-
-        Container(int openQuote, int closeQuote, String indexArgument) {
-            this.indexOpenQuote = openQuote;
-            this.indexCloseQuote = closeQuote;
-            this.indexArgument = indexArgument;
-        }
-
-        public int getIndexOpenQuote( ) {
-            return this.indexOpenQuote;
-        }
-
-        public int getIndexCloseQuote( ) {
-            return this.indexCloseQuote;
-        }
-
-        public String getIndexArgument( ) {
-            return this.indexArgument;
-        }
-
-        public void replaceLable(StringBuilder outString) {
-
-            try {
-                outString.replace(this.indexOpenQuote - 1, this.indexCloseQuote, this.indexArgument);
-            }
-            catch (NullPointerException e) {
-            }
-        }
-    }
-
-
     public String build(String formatString, Object... arguments) {
 
         if(formatString == null){
             return null;
         }
 
-        StringBuilder outString = editingFormatString(formatString);
+        StringBuilder outString = new StringBuilder(formatString);
         Container[] arrayString = insertTemplate(formatString, arguments);
 
         int counter = 0;
@@ -67,32 +32,9 @@ public class Formatter
         return outString.toString( );
     }
 
-    private StringBuilder editingFormatString(String formatString) {
-
-        StringBuilder outString = new StringBuilder(formatString);
-
-        return outString;
-    }
-
-    private char[] transformationStringToAnArray(String formatString) {
-        char[] arrayString = { };
-
-        arrayString = formatString.toCharArray( );
-
-        return arrayString;
-    }
-
-    private Container[] editingArrayContainer(Object... arguments) {
-
-        Container[] array = new Container[arguments.length];
-
-        return array;
-    }
-
     private Container[] insertTemplate(String formatString, Object... arguments) {
 
-        char[] arrayString = transformationStringToAnArray(formatString);
-
+        char[] arrayString = formatString.toCharArray();
 
         boolean flag = false;
         int countQuote = 0;
@@ -100,7 +42,7 @@ public class Formatter
         int indexClose = 0;
         int counter = 0;
 
-        Container[] array = editingArrayContainer(arguments);
+        Container[] array = new Container[arguments.length];
         StringBuilder indexLabel = new StringBuilder( );
 
         for (char element : arrayString) {
@@ -134,5 +76,27 @@ public class Formatter
         }
 
         return array;
+    }
+
+    class Container {
+
+        private int indexOpenQuote;
+        private int indexCloseQuote;
+        private String indexArgument;
+
+        Container(int openQuote, int closeQuote, String indexArgument) {
+            this.indexOpenQuote = openQuote;
+            this.indexCloseQuote = closeQuote;
+            this.indexArgument = indexArgument;
+        }
+
+        public void replaceLable(StringBuilder outString) {
+
+            try {
+                outString.replace(this.indexOpenQuote - 1, this.indexCloseQuote, this.indexArgument);
+            }
+            catch (NullPointerException e) {
+            }
+        }
     }
 }
