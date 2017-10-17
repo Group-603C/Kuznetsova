@@ -12,32 +12,32 @@ public class Formatter
 
     class Container {
 
-        private int IndexOpenQuote;
-        private int IndexCloseQuote;
-        private String IndexArgument;
+        private int indexOpenQuote;
+        private int indexCloseQuote;
+        private String indexArgument;
 
         Container(int openQuote, int closeQuote, String indexArgument) {
-            this.IndexOpenQuote = openQuote;
-            this.IndexCloseQuote = closeQuote;
-            this.IndexArgument = indexArgument;
+            this.indexOpenQuote = openQuote;
+            this.indexCloseQuote = closeQuote;
+            this.indexArgument = indexArgument;
         }
 
         public int getIndexOpenQuote( ) {
-            return this.IndexOpenQuote;
+            return this.indexOpenQuote;
         }
 
         public int getIndexCloseQuote( ) {
-            return this.IndexCloseQuote;
+            return this.indexCloseQuote;
         }
 
         public String getIndexArgument( ) {
-            return this.IndexArgument;
+            return this.indexArgument;
         }
 
         public void replaceLable(StringBuilder outString) {
 
             try {
-                outString.replace(this.IndexOpenQuote - 1, this.IndexCloseQuote, this.IndexArgument);
+                outString.replace(this.indexOpenQuote - 1, this.indexCloseQuote, this.indexArgument);
             }
             catch (NullPointerException e) {
             }
@@ -47,21 +47,21 @@ public class Formatter
 
     public String build(String formatString, Object... arguments) {
 
-        StringBuilder outString = editingFormatString(formatString);
+        if(formatString == null){
+            return null;
+        }
 
+        StringBuilder outString = editingFormatString(formatString);
         Container[] arrayString = insertTemplate(formatString, arguments);
 
         int counter = 0;
-        try {
-            counter = arguments.length - 1;
-            for (Object argument : arguments) {
-                if (arrayString[counter] != null) {
-                    arrayString[counter].replaceLable(outString);
-                }
-                counter--;
+
+        counter = arguments.length - 1;
+        for (Object argument : arguments) {
+            if (arrayString[counter] != null) {
+                arrayString[counter].replaceLable(outString);
             }
-        }
-        catch (NullPointerException e) {
+            counter--;
         }
 
         return outString.toString( );
@@ -69,10 +69,6 @@ public class Formatter
 
     private StringBuilder editingFormatString(String formatString) {
 
-        if(formatString == null) {
-            StringBuilder outString = new StringBuilder();
-            return outString;
-        }
         StringBuilder outString = new StringBuilder(formatString);
 
         return outString;
@@ -80,19 +76,13 @@ public class Formatter
 
     private char[] transformationStringToAnArray(String formatString) {
         char[] arrayString = { };
-        try {
-            arrayString = formatString.toCharArray( );
-        }
-        catch (NullPointerException e) {
-        }
+
+        arrayString = formatString.toCharArray( );
 
         return arrayString;
     }
 
     private Container[] editingArrayContainer(Object... arguments) {
-        if(arguments == null){
-            return null;
-        }
 
         Container[] array = new Container[arguments.length];
 
@@ -126,16 +116,11 @@ public class Formatter
                     flag = false;
                     String temp = indexLabel.toString( );
 
-                    try {
-                        int numberArgument = Integer.parseInt(temp);
-                        Container exemplar = new Container(indexOpen, indexClose, arguments[numberArgument].toString( ));
-                        array[counter] = exemplar;
-                        counter++;
-                    }
-                    catch (ArrayIndexOutOfBoundsException e) {
-                    }
-                    catch (NumberFormatException e) {
-                    }
+
+                    int numberArgument = Integer.parseInt(temp);
+                    Container exemplar = new Container(indexOpen, indexClose, arguments[numberArgument].toString( ));
+                    array[counter] = exemplar;
+                    counter++;
 
                     indexLabel.delete(0, indexLabel.length( ));
                 }
