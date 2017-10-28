@@ -1,99 +1,99 @@
-import java.util.regex.*;
+import java.util.ArrayList;
+import java.util.Collections;
 
-public class Formatter
-{
+
+public class Formatter {
+
     public static void main(String[] args) {
 
-        Formatter string = new Formatter( );
-        String text = string.build("If you do not passed the {0} to {1} - it's {2}", "labs", 21, "over");
+        Formatter exemplar = new Formatter( );
+        try {
 
-        System.out.println(text);
+            String instance = exemplar.build("здесь {0}, а здесь {1}, а вот {2}", "мама", "папа", "я");
+            System.out.println(instance);
+        }
+        catch (IndexOutOfBoundsException e) {
+        }
+        catch (NumberFormatException e) {
+        }
     }
 
-    public String build(String formatString, Object... arguments) {
+    static String build(String formatString, Object... arguments) {
 
-        if(formatString == null){
-            return null;
+        if (formatString == null || formatString.equals("")) {
+            return "";
         }
 
-        StringBuilder outString = new StringBuilder(formatString);
-        Container[] arrayString = insertTemplate(formatString, arguments);
+        StringBuilder builder = new StringBuilder(formatString);
+        ArrayList<Container> reverseContainer = parse(formatString, arguments);
+        Collections.reverse(reverseContainer);
+        for (Container element : reverseContainer) {
 
-        int counter = 0;
-
-        counter = arguments.length - 1;
-        for (Object argument : arguments) {
-            if (arrayString[counter] != null) {
-                arrayString[counter].replaceLable(outString);
-            }
-            counter--;
+            element.formationMessageRow(builder);
         }
 
-        return outString.toString( );
+        return builder.toString( );
     }
 
-    private Container[] insertTemplate(String formatString, Object... arguments) {
+    static private ArrayList<Container> parse(String formatString, Object... arguments) {
 
-        char[] arrayString = formatString.toCharArray();
+        int indexOPenQuite = 0;
+        int currentIndex = 0;
+        boolean isReadArgument = false;
 
-        boolean flag = false;
-        int countQuote = 0;
-        int indexOpen = 0;
-        int indexClose = 0;
-        int counter = 0;
+        ArrayList<Container> result = new ArrayList<Container>( );
+        StringBuilder argumentReader = new StringBuilder( );
+        for (char element : formatString.toCharArray( )) {
 
-        Container[] array = new Container[arguments.length];
-        StringBuilder indexLabel = new StringBuilder( );
+            currentIndex++;
 
-        for (char element : arrayString) {
-
-            countQuote++;
             if (element == '{') {
-                indexOpen = countQuote;
-                flag = true;
+                indexOPenQuite = currentIndex;
+                isReadArgument = true;
             }
-            else {
-                if (element == '}') {
-                    indexClose = countQuote;
-                    flag = false;
-                    String temp = indexLabel.toString( );
+            else if (element == '}' && isReadArgument) {
 
+                isReadArgument = false;
+                String storageLabel = argumentReader.toString( );
 
-                    int numberArgument = Integer.parseInt(temp);
-                    Container exemplar = new Container(indexOpen, indexClose, arguments[numberArgument].toString( ));
-                    array[counter] = exemplar;
-                    counter++;
-
-                    indexLabel.delete(0, indexLabel.length( ));
+                try {
+                    int numberArgument = Integer.parseInt(storageLabel);
+                    result.add(new Container(indexOPenQuite, currentIndex, arguments[numberArgument]));
+                }
+                catch (IndexOutOfBoundsException e) {
+                    throw new IndexOutOfBoundsException("Number of argument our of range.");
+                }
+                catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("Number of argument in bad format.", e);
                 }
 
-                else {
-                    if (flag) {
-                        indexLabel.append(element);
-                    }
-                }
+                argumentReader.delete(0, argumentReader.length( ));
+            }
+            else if (isReadArgument) {
+                argumentReader.append(element);
             }
         }
 
-        return array;
+        return result;
     }
 
-    class Container {
+    static class Container {
 
         private int indexOpenQuote;
         private int indexCloseQuote;
-        private String indexArgument;
+        private Object argument;
 
-        Container(int openQuote, int closeQuote, String indexArgument) {
-            this.indexOpenQuote = openQuote;
-            this.indexCloseQuote = closeQuote;
-            this.indexArgument = indexArgument;
+        Container(int open, int close, Object argument) {
+            this.indexOpenQuote = open;
+            this.indexCloseQuote = close;
+            this.argument = argument;
         }
 
-        public void replaceLable(StringBuilder outString) {
+        public void formationMessageRow(StringBuilder builder) {
 
             try {
-                outString.replace(this.indexOpenQuote - 1, this.indexCloseQuote, this.indexArgument);
+
+                builder.replace(this.indexOpenQuote - 1, this.indexCloseQuote, this.argument.toString( ));
             }
             catch (NullPointerException e) {
             }
